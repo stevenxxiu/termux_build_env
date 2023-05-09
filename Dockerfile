@@ -32,5 +32,4 @@ RUN sudo pacman-key --config pacman_aarch64.conf --init
 RUN sudo pacman-key --config pacman_aarch64.conf --recv-keys 998DE27318E867EA976BA877389CEED64573DFCA
 RUN sudo pacman-key --config pacman_aarch64.conf --lsign-key 998DE27318E867EA976BA877389CEED64573DFCA
 
-RUN rustup default stable \
-    && rustup target add aarch64-linux-android
+RUN rustup default stable
