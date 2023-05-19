@@ -33,3 +33,5 @@ RUN sudo pacman-key --config pacman_aarch64.conf --recv-keys 998DE27318E867EA976
 RUN sudo pacman-key --config pacman_aarch64.conf --lsign-key 998DE27318E867EA976BA877389CEED64573DFCA
 
 RUN rustup default stable
+
+COPY --chown=build:build config.toml .cargo/
