@@ -23,7 +23,7 @@ def main [package_path: path] {
   )
   (
     docker container exec $container_name
-    pacman-db-upgrade --root /home/build/aarch64/ --dbpath /home/build/aarch64/var/lib/pacman/
+    pacman-db-upgrade --dbpath /home/build/aarch64/var/lib/pacman/
   )
   docker container exec $container_name sudo pacman --config /home/build/pacman_aarch64.conf --sync --refresh --refresh
   docker container exec --interactive --tty --workdir /tmp/package/ $container_name /bin/sh
