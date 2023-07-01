@@ -3,7 +3,7 @@ const container_name = 'termux_container'
 const image_name = 'termux_image'
 
 def main [package_path: path] {
-  let-env DOCKER_HOST = $'unix://($env.XDG_RUNTIME_DIR)/docker.sock'
+  $env.DOCKER_HOST = $'unix://($env.XDG_RUNTIME_DIR)/docker.sock'
 
   if (do { docker images --quiet $'($image_name):latest' } | complete).stdout == '' {
     docker build --tag $image_name .
