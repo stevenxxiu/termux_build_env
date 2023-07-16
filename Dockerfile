@@ -20,7 +20,10 @@ RUN --mount=type=cache,sharing=locked,target=/var/cache/pacman \
 USER build
 WORKDIR /home/build/
 
-RUN git clone https://aur.archlinux.org/android-ndk.git && cd android-ndk \
+RUN git clone https://aur.archlinux.org/android-ndk.git
+COPY --chown=build:build PKGBUILD.diff android-ndk
+RUN cd android-ndk \
+    && patch --forward --strip=1 --input=PKGBUILD.diff \
     && makepkg --syncdeps --install --noconfirm \
     && cd .. \
     && rm -rf android-ndk
