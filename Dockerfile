@@ -1,40 +1,50 @@
 # syntax = docker/dockerfile:1.2
-FROM archlinux
+FROM alpine:3.18.2
 
-RUN echo 'Server = https://sydney.mirror.pkgbuild.com/$repo/os/$arch' > /etc/pacman.d/mirrorlist
-
-# `makepkg` cannot (and should not) be run as root:
-RUN useradd --create-home build && \
-    mkdir /etc/sudoers.d/ && \
-    echo "build ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/build
+# `makepkg` cannot (and should not) be run as `root`
+RUN adduser -D build && \
+    adduser build wheel
 
 # Install packages
-RUN --mount=type=cache,sharing=locked,target=/var/cache/pacman \
-    pacman --sync --refresh --sysupgrade --noconfirm --needed \
-        base-devel \
-        cmake \
-        git \
-        rustup
+RUN apk add \
+    binutils \
+    cmake \
+    coreutils \
+    curl \
+    doas \
+    fakeroot \
+    file \
+    findutils \
+    gcc \
+    gcompat \
+    git \
+    make \
+    musl-dev \
+    pacman \
+    patch \
+    pkgconf \
+    rustup
+
+COPY doas.conf /etc/doas.d/doas.conf
+
+WORKDIR /opt/
+ENV NDK_VERSION="android-ndk-r26-beta1"
+RUN wget -O ${NDK_VERSION}.zip https://dl.google.com/android/repository/${NDK_VERSION}-linux.zip && \
+    unzip ${NDK_VERSION}.zip && \
+    rm ${NDK_VERSION}.zip && \
+    mv ${NDK_VERSION} android-ndk
 
 # Continue execution (and `CMD`) as build:
 USER build
 WORKDIR /home/build/
 
-RUN git clone https://aur.archlinux.org/android-ndk.git
-COPY --chown=build:build PKGBUILD.diff android-ndk
-RUN cd android-ndk \
-    && patch --forward --strip=1 --input=PKGBUILD.diff \
-    && makepkg --syncdeps --install --noconfirm \
-    && cd .. \
-    && rm -rf android-ndk
-
-COPY --chown=build:build pacman_aarch64.conf .
+COPY --chown=build:build .profile pacman_aarch64.conf .
 
 RUN mkdir --parents aarch64/var/lib/pacman/local/ aarch64/var/lib/pacman/sync/
-RUN sudo pacman-key --config pacman_aarch64.conf --init
-RUN sudo pacman-key --config pacman_aarch64.conf --recv-keys 998DE27318E867EA976BA877389CEED64573DFCA
-RUN sudo pacman-key --config pacman_aarch64.conf --lsign-key 998DE27318E867EA976BA877389CEED64573DFCA
+RUN doas pacman-key --config pacman_aarch64.conf --init && \
+    doas pacman-key --config pacman_aarch64.conf --recv-keys 998DE27318E867EA976BA877389CEED64573DFCA && \
+    doas pacman-key --config pacman_aarch64.conf --lsign-key 998DE27318E867EA976BA877389CEED64573DFCA
 
-RUN rustup default stable
+RUN rustup-init -y --profile minimal --target aarch64-linux-android
 
 COPY --chown=build:build config.toml .cargo/
