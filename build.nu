@@ -9,7 +9,7 @@ def main [package_path: path] {
     docker build --tag $image_name .
   }
   if (do { docker container inspect $container_name } | complete).exit_code == 0 {
-    docker container stop $container_name
+    docker container rm --force $container_name
   }
 
   (
