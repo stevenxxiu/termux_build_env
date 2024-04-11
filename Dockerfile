@@ -1,5 +1,5 @@
 # syntax = docker/dockerfile:1.2
-FROM alpine:3.18.2
+FROM alpine:3.19.1
 
 # `makepkg` cannot (and should not) be run as `root`
 RUN adduser -D build && \
@@ -28,7 +28,7 @@ RUN apk add \
 COPY doas.conf /etc/doas.d/doas.conf
 
 WORKDIR /opt/
-ENV NDK_VERSION="android-ndk-r26-beta1"
+ENV NDK_VERSION="android-ndk-r26d"
 RUN wget -O ${NDK_VERSION}.zip https://dl.google.com/android/repository/${NDK_VERSION}-linux.zip && \
     unzip ${NDK_VERSION}.zip && \
     rm ${NDK_VERSION}.zip && \
