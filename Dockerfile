@@ -25,6 +25,9 @@ RUN apk add \
     pkgconf \
     rustup
 
+RUN apk add --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community \
+    go
+
 COPY doas.conf /etc/doas.d/doas.conf
 
 WORKDIR /opt/
