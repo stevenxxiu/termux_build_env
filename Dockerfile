@@ -42,6 +42,7 @@ USER build
 WORKDIR /home/build/
 
 COPY --chown=build:build .profile pacman_aarch64.conf .
+COPY --chown=build:build .profile serverlist .
 
 RUN mkdir --parents aarch64/var/lib/pacman/local/ aarch64/var/lib/pacman/sync/
 RUN doas pacman-key --config pacman_aarch64.conf --init && \
