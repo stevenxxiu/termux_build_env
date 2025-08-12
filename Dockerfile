@@ -28,6 +28,9 @@ RUN apk add \
 RUN apk add --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community \
     go
 
+COPY git.sh.diff /tmp/
+RUN patch /usr/share/makepkg/source/git.sh /tmp/git.sh.diff && rm /tmp/git.sh.diff
+
 COPY doas.conf /etc/doas.d/doas.conf
 
 WORKDIR /opt/
